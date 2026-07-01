@@ -1,0 +1,13 @@
+audio:
+  # null uses the default PipeWire source (e.g. the USB Fifine mic).
+  # Set to a specific PipeWire node name to pin a device.
+  device: null
+
+network:
+  # Change to the Raspberry Pi's LAN IP for a real deployment.
+  # 127.0.0.1 is used for local loopback testing on the sender machine.
+  host: 127.0.0.1
+  udp_port: 5002
+
+opus:
+  bitrate: 32000
