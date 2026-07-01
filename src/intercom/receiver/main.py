@@ -2,11 +2,13 @@ import signal
 import sys
 import time
 
-from intercom_receiver.audio.gst_pipeline import GstAudioPipeline
-from intercom_receiver.audio.receiver import Receiver
-from intercom_receiver.config import config
-from intercom_receiver.logger import logger
 
+
+from intercom.shared.config import config
+from intercom.shared.logger import logger
+
+from intercom.receiver.audio.receiver import Receiver
+from intercom.receiver.audio.gst_pipeline import GstAudioPipeline
 
 running = True
 

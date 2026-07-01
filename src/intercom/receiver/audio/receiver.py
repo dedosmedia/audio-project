@@ -1,5 +1,4 @@
-from intercom_receiver.audio.gst_pipeline import GstAudioPipeline
-
+from intercom.receiver.audio.gst_pipeline import GstAudioPipeline
 
 class Receiver:
     """
