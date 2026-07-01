@@ -1,0 +1,16 @@
+[project]
+name = "intercom-receiver"
+version = "0.1.0"
+description = "Network audio receiver for Raspberry Pi"
+readme = "README.md"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I"
+]
