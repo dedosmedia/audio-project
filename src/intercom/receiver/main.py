@@ -1,10 +1,9 @@
-import signal
-import sys
-from types import FrameType
-from typing import Optional
+import threading
 
+import uvicorn
 from gi.repository import GLib
 
+from intercom.receiver.api.app import create_app
 from intercom.receiver.audio.gst_pipeline import GstAudioPipeline
 from intercom.receiver.audio.receiver import Receiver
 from intercom.shared.config import ReceiverConfig
@@ -13,15 +12,6 @@ from intercom.shared.logger import logger
 
 
 def main() -> None:
-    loop = GLib.MainLoop()
-
-    def shutdown_handler(signum: int, frame: Optional[FrameType]) -> None:
-        logger.info("Shutdown requested")
-        loop.quit()
-
-    signal.signal(signal.SIGINT, shutdown_handler)
-    signal.signal(signal.SIGTERM, shutdown_handler)
-
     config = ReceiverConfig.from_yaml()
 
     pipeline = GstAudioPipeline(config)
@@ -31,19 +21,41 @@ def main() -> None:
         receiver.start()
     except IntercomError:
         logger.exception("Receiver failed to start")
-        sys.exit(1)
+        raise SystemExit(1)
 
     logger.info("Receiver started")
 
-    # GLib.MainLoop.run() drives the GStreamer bus dispatch: without it,
-    # the bus signal watch registered in GstAudioPipeline never fires.
-    loop.run()
+    # The GStreamer bus signal watch only fires while the GLib main context
+    # is pumped; run it on a background thread since uvicorn owns the main
+    # thread's asyncio loop.
+    glib_loop = GLib.MainLoop()
+    glib_thread = threading.Thread(target=glib_loop.run, name="gst-bus-loop", daemon=True)
+    glib_thread.start()
 
-    receiver.stop()
+    app = create_app(receiver, config)
 
-    logger.info("Receiver stopped")
+    ssl_kwargs = {}
+    if config.api_ssl_certfile and config.api_ssl_keyfile:
+        ssl_kwargs = {
+            "ssl_certfile": str(config.api_ssl_certfile),
+            "ssl_keyfile": str(config.api_ssl_keyfile),
+        }
+    else:
+        logger.warning(
+            "No SSL certificate configured; browsers will refuse microphone "
+            "access on the mobile page over plain HTTP"
+        )
 
-    sys.exit(0)
+    server = uvicorn.Server(
+        uvicorn.Config(app, host="0.0.0.0", port=config.api_port, log_level="info", **ssl_kwargs)
+    )
+
+    try:
+        server.run()
+    finally:
+        glib_loop.quit()
+        receiver.stop()
+        logger.info("Receiver stopped")
 
 
 if __name__ == "__main__":

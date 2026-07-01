@@ -30,6 +30,11 @@ def _config_dir() -> Path:
     return Path(override) if override else _PROJECT_ROOT / "config"
 
 
+def _resolve_path(path_str: str) -> Path:
+    path = Path(path_str)
+    return path if path.is_absolute() else _PROJECT_ROOT / path
+
+
 def _load_yaml(path: Path) -> dict[str, Any]:
     if not path.exists():
         raise ConfigError(f"Configuration file not found: {path}")
@@ -49,6 +54,9 @@ class ReceiverConfig:
     audio_device: str = "hw:1,0"
     latency_ms: int = DEFAULT_LATENCY_MS
     default_volume: float = DEFAULT_VOLUME
+    api_port: int = 8443
+    api_ssl_certfile: Optional[Path] = None
+    api_ssl_keyfile: Optional[Path] = None
 
     @classmethod
     def from_yaml(cls, path: Optional[Path] = None) -> "ReceiverConfig":
@@ -59,11 +67,18 @@ class ReceiverConfig:
             audio = data["audio"]
             network = data["network"]
             volume = data["volume"]
+
+            certfile = network.get("ssl_certfile")
+            keyfile = network.get("ssl_keyfile")
+
             return cls(
                 udp_port=int(network["udp_port"]),
                 audio_device=str(audio["device"]),
                 latency_ms=int(audio["latency_ms"]),
                 default_volume=float(volume["default"]),
+                api_port=int(network.get("api_port", 8443)),
+                api_ssl_certfile=_resolve_path(certfile) if certfile else None,
+                api_ssl_keyfile=_resolve_path(keyfile) if keyfile else None,
             )
         except KeyError as exc:
             raise ConfigError(f"Missing key {exc} in {path}") from exc

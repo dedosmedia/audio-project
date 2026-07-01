@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Intercom</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      background: #111;
+      color: #eee;
+      font-family: system-ui, sans-serif;
+      padding: 1.5rem;
+    }
+    #talk {
+      width: 60vw;
+      height: 60vw;
+      max-width: 260px;
+      max-height: 260px;
+      border-radius: 50%;
+      border: none;
+      background: #2563eb;
+      color: white;
+      font-size: 1.3rem;
+      font-weight: 600;
+      touch-action: none;
+      user-select: none;
+    }
+    #talk.active { background: #dc2626; }
+    #status { opacity: 0.7; font-size: 0.9rem; text-align: center; }
+    .volume-row { display: flex; align-items: center; gap: 1rem; }
+    .volume-row button {
+      width: 3.2rem;
+      height: 3.2rem;
+      border-radius: 50%;
+      border: none;
+      background: #2a2a2a;
+      color: white;
+      font-size: 1.4rem;
+    }
+    .volume-row button:active { background: #3a3a3a; }
+    #mute.muted { background: #dc2626; }
+  </style>
+</head>
+<body>
+  <div id="status">conectando...</div>
+  <button id="talk">Mantén para hablar</button>
+  <div class="volume-row">
+    <button id="vol-down">-</button>
+    <button id="mute">🔇</button>
+    <button id="vol-up">+</button>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -4,6 +4,12 @@ audio:
 
 network:
   udp_port: 5002
+  api_port: 8443
+  # Self-signed cert: browsers require HTTPS (secure context) for
+  # microphone access from the mobile web page. See README for how
+  # to generate these.
+  ssl_certfile: certs/receiver.crt
+  ssl_keyfile: certs/receiver.key
 
 volume:
   default: 0.5

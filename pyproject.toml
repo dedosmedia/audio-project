@@ -12,7 +12,12 @@ dependencies = [
     "fastapi",
     "uvicorn",
     "pyyaml",
+    "websockets",
+    "aiofiles",
 ]
+
+[project.optional-dependencies]
+test = ["httpx"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
