@@ -3,13 +3,12 @@ from intercom_receiver.audio.gst_pipeline import GstAudioPipeline
 
 class Receiver:
     """
-    High-level audio receiver abstraction.
-    No GStreamer exposed outside this class.
+    High-level receiver abstraction.
     """
 
-    def __init__(self, config):
+    def __init__(self, pipeline: GstAudioPipeline):
 
-        self._pipeline = GstAudioPipeline(config)
+        self._pipeline = pipeline
 
     def start(self):
 
@@ -19,10 +18,12 @@ class Receiver:
 
         self._pipeline.stop()
 
-    def set_volume(self, value: float):
-
-        self._pipeline.set_volume(value)
-
-    def get_volume(self) -> float:
+    @property
+    def volume(self) -> float:
 
         return self._pipeline.get_volume()
+
+    @volume.setter
+    def volume(self, value: float):
+
+        self._pipeline.set_volume(value)

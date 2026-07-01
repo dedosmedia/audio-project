@@ -1,35 +1,47 @@
+import signal
+import sys
 import time
 
+from intercom_receiver.audio.gst_pipeline import GstAudioPipeline
+from intercom_receiver.audio.receiver import Receiver
 from intercom_receiver.config import config
 from intercom_receiver.logger import logger
-from intercom_receiver.audio.receiver import Receiver
+
+
+running = True
+
+
+def shutdown_handler(signum, frame):
+
+    global running
+
+    logger.info("Shutdown requested")
+
+    running = False
 
 
 def main():
 
-    logger.info("Starting Intercom Receiver")
+    signal.signal(signal.SIGINT, shutdown_handler)
+    signal.signal(signal.SIGTERM, shutdown_handler)
 
-    receiver = Receiver(config)
+    pipeline = GstAudioPipeline(config)
 
-    logger.info("Starting audio pipeline...")
+    receiver = Receiver(pipeline)
+
     receiver.start()
 
-    logger.info("Receiver is running (UDP port %d)", config.udp_port)
-    logger.info("Press Ctrl+C to stop")
+    logger.info("Receiver started")
 
-    try:
-        while True:
-            time.sleep(1)
+    while running:
+        time.sleep(0.2)
 
-    except KeyboardInterrupt:
+    receiver.stop()
 
-        logger.info("Stopping receiver...")
+    logger.info("Receiver stopped")
 
-        receiver.stop()
-
-        logger.info("Stopped cleanly")
+    sys.exit(0)
 
 
 if __name__ == "__main__":
-
     main()

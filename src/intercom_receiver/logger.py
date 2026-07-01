@@ -1,24 +1,22 @@
 import logging
 
 
-LOGGER_NAME = "intercom"
-
-
 def create_logger() -> logging.Logger:
 
-    logger = logging.getLogger(LOGGER_NAME)
+    logger = logging.getLogger("intercom")
 
     if logger.handlers:
         return logger
 
     logger.setLevel(logging.INFO)
 
+    handler = logging.StreamHandler()
+
     formatter = logging.Formatter(
-        fmt="%(asctime)s %(levelname)s %(message)s",
-        datefmt="%H:%M:%S",
+        "%(asctime)s %(levelname)s [%(name)s] %(message)s",
+        "%H:%M:%S",
     )
 
-    handler = logging.StreamHandler()
     handler.setFormatter(formatter)
 
     logger.addHandler(handler)
