@@ -19,7 +19,6 @@ def create_logger() -> logging.Logger:
     )
 
     handler = logging.StreamHandler()
-
     handler.setFormatter(formatter)
 
     logger.addHandler(handler)
