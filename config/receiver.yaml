@@ -1,0 +1,9 @@
+audio:
+  device: hw:1,0
+  latency_ms: 20
+
+network:
+  udp_port: 5002
+
+volume:
+  default: 0.5
